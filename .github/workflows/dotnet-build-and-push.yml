@@ -1,0 +1,51 @@
+name: Build and Push .NET Project to JFrog Artifactory
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up .NET Core SDK
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.401'  # Modify version as per your project needs
+
+      # Step 3: Restore dependencies
+      - name: Restore dependencies
+        run: dotnet restore
+
+      # Step 4: Build the project
+      - name: Build the project
+        run: dotnet build --configuration Release --no-restore
+
+      # Step 5: Install JFrog CLI
+      - name: Install JFrog CLI
+        run: |
+          curl -fL https://getcli.jfrog.io | sh
+          sudo mv jfrog /usr/local/bin/jfrog
+
+      # Step 6: Configure JFrog CLI
+      - name: Configure JFrog CLI
+        run: |
+          jfrog rt config --url ${{ secrets.JFROG_URL }} \
+                          --user ${{ secrets.JFROG_USERNAME }} \
+                          --apikey ${{ secrets.JFROG_API_KEY }}
+
+      # Step 7: Push the artifact to JFrog Artifactory
+      - name: Upload .NET artifact to JFrog Artifactory
+        run: |
+          jfrog rt u "bin/Release/*.dll" "test/sampleartifact" --build-name=dotnet-build --build-number=${{ github.run_id }}
+
+      # Step 8: (Optional) Publish build info to Artifactory
+      - name: Publish build info
+        run: jfrog rt bp dotnet-build ${{ github.run_id }}
