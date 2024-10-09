@@ -60,6 +60,12 @@ jobs:
       - name: Package project
         run: dotnet publish -c Release -o ./output
 
+      - name: Configure JFrog CLI
+        run: |
+          jfrog rt config --url ${{ secrets.JFROG_URL }} \
+                        --user ${{ secrets.JFROG_USERNAME }} \
+                        --apikey ${{ secrets.JFROG_API_KEY }}  
+
       # Step 7: Upload the artifact to JFrog Artifactory
       - name: Upload .NET artifact to JFrog Artifactory
         run: |
