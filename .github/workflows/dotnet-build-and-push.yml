@@ -18,7 +18,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x' # or the version you are using
+          dotnet-version: '8.0.x'
 
       # Step 3: Restore dependencies
       - name: Restore dependencies
@@ -28,31 +28,31 @@ jobs:
       - name: Set build version
         id: versioning
         run: |
-          # Get the current version from the project file
-          current_version=$(dotnet exec --project ./SampleDotNetApp/SampleDotNetApp.csproj --version)
+          # Extract version from the .csproj file
+          current_version=$(dotnet msbuild ./SampleDotNetApp/SampleDotNetApp.csproj -t:GetVersion -nologo | grep -oP '(?<=Version=)\S+')
           echo "Current version: $current_version"
 
-          # Extract the major, minor, and build numbers
+          # Extract major and minor version
           major_version=$(echo $current_version | cut -d. -f1)
           minor_version=$(echo $current_version | cut -d. -f2)
+          
+          # Auto-increment build number using the GitHub run number
           build_number=$(( $GITHUB_RUN_NUMBER ))
 
           # Construct the new version (major.minor.build)
           new_version="${major_version}.${minor_version}.${build_number}"
           echo "New version: $new_version"
 
-          # Use this version in subsequent steps
+          # Make the new version available to other steps
           echo "VERSION=$new_version" >> $GITHUB_ENV
 
       # Step 5: Build the project with the new version
       - name: Build project
-        run: |
-          dotnet build -c Release /p:Version=${{ env.VERSION }}
+        run: dotnet build -c Release /p:Version=${{ env.VERSION }}
 
-      # Step 6: Package the build (optional)
+      # Step 6: Package the build
       - name: Package project
-        run: |
-          dotnet publish -c Release -o ./output
+        run: dotnet publish -c Release -o ./output
 
       # Step 7: Upload the artifact to JFrog Artifactory
       - name: Upload .NET artifact to JFrog Artifactory
