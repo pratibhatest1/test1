@@ -29,7 +29,7 @@ jobs:
         id: versioning
         run: |
           # Extract version from the .csproj file
-          current_version=$(dotnet msbuild ./SampleDotNetApp/SampleDotNetApp.csproj -t:GetVersion -nologo | grep -oP '(?<=Version=)\S+')
+          current_version=$(grep -oPm1 "(?<=<Version>)[^<]+" ./SampleDotNetApp/SampleDotNetApp.csproj)
           echo "Current version: $current_version"
 
           # Extract major and minor version
