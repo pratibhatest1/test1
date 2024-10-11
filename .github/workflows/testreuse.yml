@@ -8,12 +8,10 @@ on:
 
 jobs:
   call-push-artifact:
-    uses: Pratibhas54/SampleDotNetApp/.github/workflows/dotnet-build-push.yml@main
+    uses: pratibhatest1/SampleDotNetApp/.github/workflows/dotnet-build-push.yml@main
     with:
       dotnet_version: '8.0.x'               
       csproj_file: './test1/SampleDotNetApp.csproj'  
       jfrog_artifact_path: 'test/testone'   
-    secrets:
-      JFROG_URL: ${{ secrets.JFROG_URL }}        
-      JFROG_USERNAME: ${{ secrets.JFROG_USERNAME }}
-      JFROG_API_KEY: ${{ secrets.JFROG_API_KEY }}
+    secrets: inherit
+      
