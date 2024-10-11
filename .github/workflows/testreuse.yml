@@ -11,7 +11,7 @@ jobs:
     uses: pratibhatest1/SampleDotNetApp/.github/workflows/dotnet-build-push.yml@main
     with:
       dotnet_version: '8.0.x'               
-      csproj_file: './test1/SampleDotNetApp.csproj'  
+      csproj_file: './SampleDotNetApp.csproj'  
       jfrog_artifact_path: 'test/testone'   
     secrets: inherit
       
